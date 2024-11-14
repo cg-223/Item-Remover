@@ -8,7 +8,7 @@
 
 
 local mod = SMODS.current_mod
-
+ 
 if not mod.config["Disabled Things"] then
     mod.config["Disabled Things"]  = {
 
