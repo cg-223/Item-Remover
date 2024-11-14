@@ -8,7 +8,7 @@
 
 
 local mod = SMODS.current_mod
- 
+
 if not mod.config["Disabled Things"] then
     mod.config["Disabled Things"]  = {
 
@@ -33,7 +33,7 @@ function Card:click()
     local antiVal = nil
     if self.config.card then antiVal = self.config.center.key end
     if self.config.blind then antiVal = self.config.blind.key end
-    if self.edition then antiVal = self.edition.key end
+    if self.edition then antiVal = nil end
     local dontDisable = {
         bl_small = true,
         bl_big = true,
