@@ -45,6 +45,7 @@ function Card:click()
         c_strength = true,
         c_base,
         e_base,
+        p_buffoon_normal_1
     }
     if G.your_collection and G.your_collection[1] and G.your_collection[1].cards and self.config and antiVal and not dontDisable[antiVal] then
         for j = 1, #G.your_collection do
@@ -81,12 +82,33 @@ function get_new_boss()
     return ret
 end
 
+local oldfunc = get_pack
+function get_pack(_key, _type)
+    local ret = oldfunc(_key, _type)
+    if ret and ret.key and mod.config["Disabled Things"][ret.key] == true then
+        return get_pack(_key, _type)
+    end
+    return ret
+end
+
 local oldfunc = Card.init
 function Card:init(X, Y, W, H, card, center, params)
     local ret = oldfunc(self,X, Y, W, H, card, center, params)
-    if mod.config["Disabled Things"][self.config.center.key] then
-        self.debuff = mod.config["Disabled Things"][self.config.center.key]
-    end
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 0.05,
+        blocking = false,
+        blockable = false,
+        func = (function()
+            local antiVal = nil
+            if self.config.card then antiVal = self.config.center.key end
+            if self.config.blind then antiVal = self.config.blind.key end
+            if mod.config["Disabled Things"][antiVal] then
+                self.debuff = mod.config["Disabled Things"][antiVal]
+            end
+            return true
+        end)
+    }))
     return ret
 end
 
@@ -138,6 +160,35 @@ G.FUNCS.enable_all = function(e)
     }
 end
 
+G.FUNCS.preset_vanilla_jokers = function(e)
+    for k,v in pairs(G.P_CENTER_POOLS.Joker) do
+        if v.order and v.order <= 150 then
+            mod.config['Disabled Things'][v.key] = true
+        end
+    end
+end
+
+
+
+function create_UIBox_preset_disables()
+    local t = create_UIBox_generic_options({ back_func = 'mods_button', contents = {
+      {n=G.UIT.C, config={align = "cm", padding = 0.15}, nodes={
+        UIBox_button({button = 'preset_vanilla_jokers', label = {'Disable Vanilla Jokers'}, minw = 5, minh = 2, scale = 0.7, id = 'preset_vanilla_jokers'}),
+        --UIBox_button({button = 'your_collection_decks', label = {localize('b_decks')}, count = G.DISCOVER_TALLIES.backs, minw = 5}),
+        --UIBox_button({button = 'your_collection_vouchers', label = {localize('b_vouchers')}, count = G.DISCOVER_TALLIES.vouchers, minw = 5, id = 'your_collection_vouchers'}),
+      }},
+      
+    }})
+    return t
+end
+
+G.FUNCS.presets = function(e)
+    G.SETTINGS.paused = true
+    G.FUNCS.overlay_menu{
+      definition = create_UIBox_preset_disables(),
+    }
+end
+
 
 local jimboTabs = function() return {
 	{
@@ -149,6 +200,10 @@ local jimboTabs = function() return {
 
             settings.nodes[#settings.nodes + 1] =
                 UIBox_button({button = 'enable_all', label = {"Reset Disabled"},  minw = 5, minh = 1.7, scale = 0.6, id = 'enable_all'})
+            settings.nodes[#settings.nodes + 1] =
+                UIBox_button({button = 'presets', label = {"Presets"},  minw = 5, minh = 1.7, scale = 0.6, id = 'presets'})
+            
+            
 			config = { n = G.UIT.R, config = { align = "tm", padding = 0 }, nodes = { settings } }
 			jimbo_nodes[#jimbo_nodes + 1] = config
 			return {
