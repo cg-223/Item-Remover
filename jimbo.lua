@@ -149,8 +149,8 @@ local mod = SMODS.current_mod
                 or (not (mod.config["Disabled Things"][_pool[i]] 
                     and mod.config["Disabled Things"][_pool[i]] == true)) 
             then
+		truepool[#truepool+1] = _pool[i]
                 if _pool[i] ~= 'UNAVAILABLE' then 
-                    truepool[#truepool+1] = _pool[i]
                     truepoolsize = truepoolsize+1
                 end
             else
