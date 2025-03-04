@@ -70,7 +70,7 @@ local mod = SMODS.current_mod
         if self.config.blind then antiVal = self.config.blind.key end
         if self.edition then antiVal = nil end
 
-        if self.area and self.area.config.collection then
+        if self.area and self.area.config.collection and antiVal and not dontDisable[antiVal] then
                     self.debuff = not self.debuff
                     mod.config["Disabled Things"][antiVal] = not mod.config["Disabled Things"][antiVal] or self.debuff
                     --print(mod.config["Disabled Things"][antiVal])
