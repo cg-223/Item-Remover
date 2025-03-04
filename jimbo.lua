@@ -70,17 +70,11 @@ local mod = SMODS.current_mod
         if self.config.blind then antiVal = self.config.blind.key end
         if self.edition then antiVal = nil end
 
-        if G.your_collection and G.your_collection[1] and G.your_collection[1].cards and self.config and antiVal and not dontDisable[antiVal] then
-            for j = 1, #G.your_collection do
-                for i = #G.your_collection[j].cards,1, -1 do
-                if G.your_collection[j].cards[i] == self then
+        if self.area and self.area.config.collection then
                     self.debuff = not self.debuff
                     mod.config["Disabled Things"][antiVal] = not mod.config["Disabled Things"][antiVal] or self.debuff
                     --print(mod.config["Disabled Things"][antiVal])
                     SMODS.save_mod_config(mod)
-                end
-                end
-            end
         end
         return ret
     end
